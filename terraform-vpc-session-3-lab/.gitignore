@@ -1,0 +1,29 @@
+# Terraform working directory and provider binaries
+.terraform/
+
+# State can contain sensitive values and must not be committed
+*.tfstate
+*.tfstate.*
+
+# Saved plan files
+*.tfplan
+tfplan
+
+# Local variable values may contain sensitive data
+terraform.tfvars
+*.auto.tfvars
+
+# Terraform crash and override files
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration and generated graphs
+.terraformrc
+terraform.rc
+*.dot
+*.svg
+*.png
