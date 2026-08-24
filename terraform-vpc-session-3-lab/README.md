@@ -116,11 +116,15 @@ Validation checks Terraform syntax and internal references. It does not prove th
 
 ## Exercise 4 — Examine variables and override defaults
 
-This repository includes a `terraform.tfvars` file containing the actual non-sensitive values used by the lab. Terraform loads this file automatically. The included values select `us-east-1` and the `development` environment.
+This repository includes `terraform.tfvars.example` as a safe template. Terraform does not load files ending in `.example` automatically. Create your local variable file from it:
 
-`terraform.tfvars.example` is a reusable template. Terraform does not load files ending in `.example` automatically.
+```powershell
+Copy-Item terraform.tfvars.example terraform.tfvars
+```
 
-Edit `terraform.tfvars` whenever you want to override a default declared in `variables.tf`. Do not put credentials, passwords or other secrets in a committed variable file.
+Terraform automatically loads the new `terraform.tfvars` file. Its values override defaults declared in `variables.tf`. The file is ignored by Git because real projects may place account-specific or sensitive values in it.
+
+The example selects `us-east-1` and the `development` environment. Edit your local copy if you want different values. Never place credentials, passwords or other secrets in a committed variable file.
 
 You can also override one variable temporarily:
 
@@ -461,7 +465,7 @@ Make sure you copied only the Terraform graph output, starting with `digraph {` 
 ## Safety notes
 
 - Always read a plan before applying it.
-- Never commit state files, credentials or variable files containing secrets. The included `terraform.tfvars` contains only non-sensitive lab values.
+- Never commit state files, credentials or `terraform.tfvars` files that might contain sensitive or account-specific values.
 - Do not manually edit Terraform state.
 - Do not experiment with production infrastructure.
 - Run `terraform destroy` after completing this practice lab.
