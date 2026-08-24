@@ -9,7 +9,8 @@
 *.tfplan
 tfplan
 
-# Automatically loaded variable files may contain sensitive data
+# Local variable values may contain sensitive data
+terraform.tfvars
 *.auto.tfvars
 
 # Terraform crash and override files
