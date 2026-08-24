@@ -266,7 +266,7 @@ Drift occurs when the real infrastructure changes outside Terraform and no longe
 2. Go to **VPC > Your VPCs**.
 3. Select the VPC whose Name is `terraform-session-3-lab-vpc`.
 4. Edit its tags.
-5. Change the `Environment` tag from `practice` to `changed-manually`.
+5. Change the `Environment` tag from `development` to `changed-manually`.
 6. Do not change or delete the CIDR block, subnets or routing.
 
 Now run:
@@ -279,7 +279,7 @@ Expected result:
 
 - Terraform refreshes its understanding of the remote VPC.
 - It reports that the VPC changed outside Terraform.
-- The plan proposes an in-place update that changes `Environment` back to `practice`.
+- The plan proposes an in-place update that changes `Environment` back to `development`.
 - The summary should show approximately `0 to add, 1 to change, 0 to destroy`.
 
 The exact wording can vary by Terraform and AWS provider version.
@@ -300,7 +300,7 @@ Review the proposed tag correction, enter:
 yes
 ```
 
-Expected result: Terraform changes the AWS tag back to `practice`. A following `terraform plan` reports no changes.
+Expected result: Terraform changes the AWS tag back to `development`. A following `terraform plan` reports no changes.
 
 ### Option B: Accept the remote change into state only
 
@@ -318,7 +318,7 @@ Apply the refresh-only plan:
 terraform apply -refresh-only
 ```
 
-Expected result: state accepts the remote tag value. However, the configuration still says `practice`, so a later normal `terraform plan` proposes changing the AWS tag back to `practice`.
+Expected result: state accepts the remote tag value. However, the configuration still says `development`, so a later normal `terraform plan` proposes changing the AWS tag back to `development`.
 
 This distinction is important:
 
@@ -337,7 +337,7 @@ terraform apply
 Change this value in `terraform.tfvars`:
 
 ```hcl
-environment = "development"
+environment = "test"
 ```
 
 Format and review:
