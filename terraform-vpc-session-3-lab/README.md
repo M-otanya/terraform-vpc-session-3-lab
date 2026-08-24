@@ -34,7 +34,7 @@ Install and configure:
 - Terraform CLI
 - AWS CLI
 - An AWS account and credentials with permission to manage VPC resources
-- Graphviz, for the optional graph exercises
+- A web browser, for viewing dependency graphs with Graphviz Online
 
 Confirm the tools:
 
@@ -116,13 +116,11 @@ Validation checks Terraform syntax and internal references. It does not prove th
 
 ## Exercise 4 — Examine variables and override defaults
 
-The default region is `eu-west-1`. To use another region, copy the example file:
+This repository includes a `terraform.tfvars` file containing the actual non-sensitive values used by the lab. Terraform loads this file automatically. The included values select `us-east-1` and the `development` environment.
 
-```powershell
-Copy-Item terraform.tfvars.example terraform.tfvars
-```
+`terraform.tfvars.example` is a reusable template. Terraform does not load files ending in `.example` automatically.
 
-Edit `terraform.tfvars`, then change `aws_region` if required. The real `terraform.tfvars` file is ignored by Git.
+Edit `terraform.tfvars` whenever you want to override a default declared in `variables.tf`. Do not put credentials, passwords or other secrets in a committed variable file.
 
 You can also override one variable temporarily:
 
@@ -220,43 +218,45 @@ Important: do not edit `terraform.tfstate` manually.
 
 ## Exercise 9 — Visualize the dependency graph
 
-Install Graphviz on Windows if it is not already installed:
+Terraform prints dependency information using the Graphviz DOT language. You can paste that output into [Graphviz Online](https://dreampuf.github.io/GraphvizOnline/) without installing Graphviz.
+
+### Creation graph
+
+Run:
 
 ```powershell
-winget install Graphviz.Graphviz
+terraform graph -type=plan -draw-cycles
 ```
 
-Open a new PowerShell window and confirm it:
+Copy the complete terminal output, beginning with:
+
+```text
+digraph {
+```
+
+and ending with the final closing brace:
+
+```text
+}
+```
+
+Open [Graphviz Online](https://dreampuf.github.io/GraphvizOnline/), remove its sample text and paste the Terraform output into the editor. The diagram is generated automatically. Use the website's download option to save the graph as an SVG or PNG image.
+
+Expected result: the diagram shows the resources, variables, provider, outputs and dependency edges used during planning. The detailed plan graph contains Terraform internal operations, so it is more complicated than an ordinary architecture diagram. `-draw-cycles` highlights cycle edges if Terraform detects a circular dependency.
+
+### Destroy graph
+
+Run:
 
 ```powershell
-dot -V
+terraform graph -type=plan-destroy -draw-cycles
 ```
 
-Generate the creation graph:
+Copy the complete `digraph` output, paste it into Graphviz Online and download the resulting SVG or PNG image.
 
-```powershell
-terraform graph -type=plan -draw-cycles | dot -Tsvg -o creation-graph.svg
-start creation-graph.svg
-```
+Expected result: the destroy graph reverses the relevant dependency order so child resources can be removed before the resources they depend on. This command creates only a diagram; it does not destroy infrastructure.
 
-Expected result: an SVG opens showing Terraform operations and dependency edges. The detailed plan graph includes internal Terraform nodes as well as resources, so it is more complicated than an ordinary architecture diagram. Any dependency cycle would be highlighted by `-draw-cycles`.
-
-Generate the destroy graph:
-
-```powershell
-terraform graph -type=plan-destroy -draw-cycles | dot -Tsvg -o destroy-graph.svg
-start destroy-graph.svg
-```
-
-Expected result: an SVG opens showing dependencies for destroy planning. This command only creates a diagram; it does not destroy infrastructure.
-
-Create a graph from an exact saved normal plan:
-
-```powershell
-terraform plan -out=tfplan
-terraform graph -plan=tfplan | dot -Tsvg -o saved-plan-graph.svg
-start saved-plan-graph.svg
-```
+Important: type the flags with normal keyboard hyphens (`-`). A copied long dash (`–`) is not a valid Terraform option.
 
 ## Exercise 10 — Create safe, intentional drift
 
@@ -363,7 +363,7 @@ Enter `yes` when prompted. Expected result: the VPC and subnet tags are updated 
 Create a saved destroy plan:
 
 ```powershell
-terraform plan -destroy -out=destroy.tfplan
+terraform plan -destroy -out="destroy.tfplan"
 ```
 
 Expected result:
@@ -375,10 +375,10 @@ Expected result:
 Review it:
 
 ```powershell
-terraform show destroy.tfplan
+terraform show "destroy.tfplan"
 ```
 
-Do not run `terraform apply destroy.tfplan` unless you are ready to remove the lab.
+Do not run `terraform apply "destroy.tfplan"` unless you are ready to remove the lab.
 
 ## Exercise 14 — Destroy the lab
 
@@ -454,18 +454,14 @@ aws configure get region
 
 The provider uses `var.aws_region`, which can differ from the AWS CLI default region.
 
-### Graphviz `dot` is not recognized
+### Graphviz Online reports a syntax error
 
-Close and reopen PowerShell after installing Graphviz. Then run:
-
-```powershell
-dot -V
-```
+Make sure you copied only the Terraform graph output, starting with `digraph {` and ending with its final `}`. Do not include the PowerShell prompt or unrelated terminal messages.
 
 ## Safety notes
 
 - Always read a plan before applying it.
-- Never commit state files, credentials or real `terraform.tfvars` files containing secrets.
+- Never commit state files, credentials or variable files containing secrets. The included `terraform.tfvars` contains only non-sensitive lab values.
 - Do not manually edit Terraform state.
 - Do not experiment with production infrastructure.
 - Run `terraform destroy` after completing this practice lab.
